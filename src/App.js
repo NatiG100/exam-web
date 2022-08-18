@@ -1,8 +1,9 @@
 import './App.css';
+import Container from './components/Container/Container';
 
 function App() {
   return (
-    <h1>App</h1>
+    <Container/>
   );
 }
 
