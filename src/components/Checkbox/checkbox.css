@@ -1,10 +1,10 @@
-.radio-container{
-    border-radius: 40px;
+.checkbox-container{
+    border-radius: 5px;
     cursor: pointer;
-    outline:1px solid #999;
+    border:3px solid rgb(97, 172, 195);
     display: flex;
-    width: 16px;
-    height: 16px;
+    width: 14px;
+    height: 14px;
     align-items: center;
     justify-content: center;
     transition: all 200ms ease-out;
@@ -13,34 +13,28 @@
     margin:0;
     box-sizing: content-box;
 }
-.radio-container:hover{
-    outline:2px solid #f16d37;
+.checkbox:focus{
+    outline:3px solid rgb(41, 100, 118);
 }
-.selected-radio{
-    outline:2px solid #f16d37;
-    box-shadow: 0px 0px 1px #f16d37;
-    background-color: #f16d37;
-}
-.selected-radio:hover{
-}
-.radiomark-icon{
+.checkboxmark-icon{
     margin-left:-1px;
-    stroke: white;
+    stroke-width: 2px;
+    stroke: rgb(61, 122, 141);
     height: 11px;
     width: 11px;
 }
-.radio{
+.checkbox{
     position: absolute;
     cursor: pointer;
     opacity: 0;
     height: 0px;
     width:0px;
 }
-.radio-label{
+.checkbox-label{
     font-size: 14px;
     color: #374151;
 }
-.radio-box{
+.checkbox-box{
     margin-bottom: 10px;
     width:100%;
 }
