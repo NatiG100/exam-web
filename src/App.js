@@ -5,6 +5,7 @@ import Input from './components/Input/Input';
 import { useState } from 'react';
 import {ReactComponent as SearchIcon} from './assets/svg/search.svg'
 import Checkbox from './components/Checkbox/Checkbox';
+import Button from './components/Button/Button';
 
 function App() {
   const [value,setValue] = useState("specific");
@@ -102,6 +103,9 @@ function App() {
               </div>
             ))
           }
+          <div style={{display:"flex",width:"100%", justifyContent:"flex-end"}}>
+            <Button type="submit">Apply tax to 5 item(s)</Button>
+          </div>
         </form>
       </Container>
     </div>
