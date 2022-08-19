@@ -1,8 +1,8 @@
 import './container.css';
-const Container = ({Children,maxWidth})=>{
+const Container = ({children,maxWidth})=>{
     return(
         <div className="form-container" sx={{maxWidth:maxWidth&&maxWidth}}>
-            {Children}
+            {children}
         </div>
     )
 }
