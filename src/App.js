@@ -8,6 +8,7 @@ import Checkbox from './components/Checkbox/Checkbox';
 import Button from './components/Button/Button';
 import Divider from './components/Divider/Divider';
 import { initialItems } from './data';
+import { useFormik} from 'formik';
 
 function App() {
   const [value,setValue] = useState("specific");
@@ -25,6 +26,7 @@ function App() {
         })
       })
       setItems(newItems);
+      countSelected();
     }
   },[value])
   const handleThisChange = ()=>{
@@ -56,6 +58,7 @@ function App() {
       setValue("specific")
     }
     setItems(newItems);
+    countSelected();
   }
   const onItemChange = (itemIndex)=>{
     let newItems = [...items];
@@ -75,6 +78,7 @@ function App() {
       setValue("specific")
     }
     setItems(newItems);
+    countSelected();
   }
   const [items,setItems] = useState(initialItems);
 
@@ -83,6 +87,7 @@ function App() {
   const [searchQuery,setSearchQuery] = useState("");
   const onSearchQueryChange = (event)=>{
     setSearchQuery(event.target.value);
+    countSelected();
   }
   const filterItems = ()=>{
     let filteredItems= JSON.parse(JSON.stringify(items));
@@ -97,20 +102,84 @@ function App() {
     return filteredItems;
   }
 
+  const [count,setCount] = useState(0);
+  const countSelected = ()=>{
+    let tempCount=0;
+    filterItems(items).forEach((item)=>{
+      item.subItems.forEach((subItem)=>{
+        if(subItem.selected){
+          tempCount++;
+        }
+      })
+    })
+    setCount(tempCount);
+  }
+
+  const formik = useFormik({
+    initialValues:{
+      name:"",
+      rate:"50"
+    },
+    validate:values=>{
+      const errors = {};
+      if(!values.name){
+        errors.name = 'Required'
+      }if(!values.rate){
+        errors.rate = 'Required'
+      }
+      return errors;
+    },
+    onSubmit: values=>{
+      const requestObject={
+        applicableItems:getApplicableItems(),
+        applied_to:value,
+        name:values.name,
+        rate:parseFloat(values.rate)/100,
+      }
+      alert(JSON.stringify(requestObject,null,4));
+    }
+  })
+  const getApplicableItems = ()=>{
+    let applicableItems=[];
+    filterItems(items).forEach((item)=>{
+      item.subItems.forEach((subItem)=>{
+        if(subItem.selected){
+          applicableItems.push(subItem.id);
+        }
+      })
+    })
+    return applicableItems;
+  }
+
+  useEffect(()=>{
+    console.log(formik.errors);
+  },[formik])
   return (
     <div className='app'>
       <Container>
-        <form>
+        <form onSubmit={formik.handleSubmit}>
           <h2 style={{fontWeight:'450',color:"#374151",marginBottom:"18px"}}>Add Tax</h2>
           <div style={{display:'flex',gap:'10px', paddingBottom:"18px"}}>
             <Input
               maxWidth="400px"
               placeholder="Tax Name"
+              id="namem"
+              name="name"
+              onChange={formik.handleChange}
+              value={formik.values.name}
+              onBlur={formik.handleBlur}
+              error={formik.errors.name}
             />
             <Input
               maxWidth="100px"
               type="number"
               endText="%"
+              id="rate"
+              name="rate"
+              onChange={formik.handleChange}
+              value={formik.values.rate}
+              onBlur={formik.handleBlur}
+              error={formik.errors.rate}
             />
           </div>
 
@@ -174,7 +243,7 @@ function App() {
           </p>
           {
             filterItems(items)[0]&&(<div style={{display:"flex",width:"100%", justifyContent:"flex-end"}}>
-              <Button type="submit">Apply tax to 5 item(s)</Button>
+              <Button type="submit">Apply tax to {count} item(s)</Button>
             </div>)
           }
         </form>

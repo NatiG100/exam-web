@@ -5,15 +5,18 @@ export const initialItems = [
       subItems:[
         {
           name:"Jasinthe Bracelets",
-          selected:false
+          selected:false,
+          id:"1234"
         },
         {
           name:"Jasinthe Bracelets",
-          selected:false
+          selected:false,
+          id:"1235"
         },
         {
           name:"Inspire Braceclets",
-          selected:false
+          selected:false,
+          id:"1236"
         },
       ]
     },
@@ -23,23 +26,28 @@ export const initialItems = [
       subItems:[
         {
           name:"Recurring Item",
-          selected:false
+          selected:false,
+          id:"1237"
         },
         {
           name:"Recurring Item with questions",
-          selected:false
+          selected:false,
+          id:"1238"
         },
         {
           name:"Zero amount item with questions",
-          selected:false
+          selected:false,
+          id:"1239"
         },
         {
           name:"Normal item with questions",
-          selected:false
+          selected:false,
+          id:"1240"
         },
         {
           name:"normal item",
-          selected:false
+          selected:false,
+          id:"1241"
         },
       ]
     }
