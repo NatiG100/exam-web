@@ -2,10 +2,12 @@ import './App.css';
 import Radio from './components/Radio/Radio';
 import Container from './components/Container/Container';
 import Input from './components/Input/Input';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {ReactComponent as SearchIcon} from './assets/svg/search.svg'
 import Checkbox from './components/Checkbox/Checkbox';
 import Button from './components/Button/Button';
+import Divider from './components/Divider/Divider';
+import { initialItems } from './data';
 
 function App() {
   const [value,setValue] = useState("specific");
@@ -13,30 +15,88 @@ function App() {
   const handleChange = (event)=>{
     setValue(event.target.value);
   }
+  useEffect(()=>{
+    if(value==="all"){
+      let newItems = [...items]
+      newItems.forEach((item,index)=>{
+        item.selected=true;
+        item.subItems.forEach((subItem,index)=>{
+          subItem.selected=true;
+        })
+      })
+      setItems(newItems);
+    }
+  },[value])
   const handleThisChange = ()=>{
     setChecked((checked)=>(!checked));
-    console.log(checked);
   }
-  const items = [
-    {
-      name:"Bracelets",
-      subItems:[
-        "Jasinthe Bracelets",
-        "Jasinthe Bracelets",
-        "Inspire Braceclets"
-      ]
-    },
-    {
-      name:"",
-      subItems:[
-        "Recurring Item",
-        "Recurring Item with questions",
-        "Zero amount item with questions",
-        "Normal item with questions",
-        "normal item"
-      ]
+  const onSubItemChange = (itemIndex,subItemIndex)=>{
+    let newItems=[...items];
+    newItems[itemIndex].subItems[subItemIndex].selected = !newItems[itemIndex].subItems[subItemIndex].selected;
+    let isAllChecked = true;
+    newItems[itemIndex].subItems.forEach((item)=>{
+      if(!item.selected){
+        isAllChecked = false;
+      }
+    })
+    if(isAllChecked){
+      newItems[itemIndex].selected=true;
+    }else{
+      newItems[itemIndex].selected=false;
     }
-  ]
+    let allSelected=true;
+    newItems.forEach((item)=>{
+      if(!item.selected){
+        allSelected=false;
+      }
+    })
+    if(allSelected){
+      setValue("all");
+    }else{
+      setValue("specific")
+    }
+    setItems(newItems);
+  }
+  const onItemChange = (itemIndex)=>{
+    let newItems = [...items];
+    newItems[itemIndex].selected=!newItems[itemIndex].selected;
+    newItems[itemIndex].subItems.forEach((item,index)=>{
+      newItems[itemIndex].subItems[index].selected = newItems[itemIndex].selected;
+    })
+    let allSelected=true;
+    newItems.forEach((item)=>{
+      if(!item.selected){
+        allSelected=false;
+      }
+    })
+    if(allSelected){
+      setValue("all");
+    }else{
+      setValue("specific")
+    }
+    setItems(newItems);
+  }
+  const [items,setItems] = useState(initialItems);
+
+
+  // filter logic
+  const [searchQuery,setSearchQuery] = useState("");
+  const onSearchQueryChange = (event)=>{
+    setSearchQuery(event.target.value);
+  }
+  const filterItems = ()=>{
+    let filteredItems= JSON.parse(JSON.stringify(items));
+    filteredItems.forEach((item,index)=>{
+      filteredItems[index].subItems=item.subItems.filter((subItem)=>{return subItem.name.toLowerCase().includes(searchQuery.toLowerCase())});
+    })
+    filteredItems.forEach((item,index)=>{
+      if(item.subItems.length===0){
+        delete filteredItems[index];
+      }
+    })
+    return filteredItems;
+  }
+
   return (
     <div className='app'>
       <Container>
@@ -72,30 +132,34 @@ function App() {
               selected={value}
             />
           </div>
+          <Divider/>
           <Input
             maxWidth={"320px"}
             Icon={SearchIcon}
             placeholder="Search Items"
+            onChange = {onSearchQueryChange}
+            value={searchQuery}
           />
           {
-            items.map((item,index)=>(
+            filterItems(items).map((item,index)=>(
               <div key={index}>
                 <div style={{width:"100%",padding:"8px",backgroundColor:"rgb(229,231,235)",marginTop:"10px",marginBottom:"10px"}}>
                   <Checkbox
-                    selected={checked}
+                    selected={item.selected}
                     text={item.name}
-                    onChange={handleThisChange}
+                    onChange={()=>{onItemChange(index)}}
                     id={"this"}
                   />
                 </div>
                 {
                   item.subItems.map((subItem,subIndex)=>(
-                    <div style={{width:"100%",padding:"8px",marginLeft:"15px",marginTop:"10px",marginBottom:"10px"}}>
+                    <div style={{width:"100%",padding:"8px",marginLeft:"15px",marginTop:"10px",marginBottom:"10px" }} key={subIndex}>
                       <Checkbox
-                        selected={checked}
-                        text={subItem}
+                        selected={subItem.selected}
+                        text={subItem.name}
                         onChange={handleThisChange}
                         id={"this"}
+                        onClick={()=>{onSubItemChange(index,subIndex)}}
                       />
                     </div>
                   ))
@@ -103,9 +167,16 @@ function App() {
               </div>
             ))
           }
-          <div style={{display:"flex",width:"100%", justifyContent:"flex-end"}}>
-            <Button type="submit">Apply tax to 5 item(s)</Button>
-          </div>
+          <p style={{color:"#555",textAlign:"center",marginTop:"20px",marginBottom:"20px",}}>
+            {
+              !filterItems(items)[0]?"No Items Found":""
+            }
+          </p>
+          {
+            filterItems(items)[0]&&(<div style={{display:"flex",width:"100%", justifyContent:"flex-end"}}>
+              <Button type="submit">Apply tax to 5 item(s)</Button>
+            </div>)
+          }
         </form>
       </Container>
     </div>
